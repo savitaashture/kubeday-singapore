@@ -36,20 +36,13 @@ spec:
       value: "{{ repo_url }}"
     - name: revision
       value: "{{ revision }}"
-    - name: target_branch
-      value: "{{ target_branch }}"
-    - name: registry
-      value: quay.io/savitaashture
   pipelineSpec:
     params:
       - name: repo_url
       - name: revision
-      - name: target_branch
-      - name: registry
     workspaces:
       - name: source
       - name: basic-auth
-      - name: dockerconfig
     tasks:
       - name: fetch-repository
         taskRef:
