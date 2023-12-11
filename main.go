@@ -12,7 +12,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimPrefix(r.URL.Path, "/")
 
 	// Generate an HTML response with tags
-	htmlResponse := fmt.Sprintf("<html><body><h1>Hello, It's Kubeday Singapore 2023!!! and we are deploying image version %s</h1></body></html>", path)
+	htmlResponse := fmt.Sprintf("<html><body><h1>Hello, It's Kubeday Singapore 2023!!! and we are deploying image version v1 %s</h1></body></html>", path)
 
 	// Write the HTML response
 	w.Header().Set("Content-Type", "text/html")
