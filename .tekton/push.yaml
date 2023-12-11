@@ -67,7 +67,19 @@ spec:
             value: .
         workspaces:
           - name: source
-            workspace: source 
+            workspace: source
+      - name: noop-task
+        taskSpec:
+          steps:
+            - name: noop-task
+              image: ubuntu
+              script: |
+                #! /bin/bash
+                echo $(params.revision)
+                echo $(params.repo_url)
+                echo {{ company }}
+                sleep 20
+                exit 0            
   workspaces:
   - name: source
     volumeClaimTemplate:
