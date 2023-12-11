@@ -108,7 +108,7 @@ kubectl -n kyverno wait --for=condition=Available deployment/kyverno-reports-con
 
 1. Apply policies which are required for CI flow
 
-    *. `kubectl create -f policies/require-namespace.yaml`
+    `kubectl create -f policies/require-annotation.yaml`
 
 2. Kyverno policies will kick in and reject request if not satisfied
 
@@ -120,11 +120,12 @@ kubectl -n kyverno wait --for=condition=Available deployment/kyverno-reports-con
             tkn-pac create repo -n $NAMESPACE
             ```
 
-5. Send a pull request to https://github.com/savitaashture/kubeday-singapore and observe the triggering of the PipelineRun for the pull request
+4. Send a pull request to https://github.com/savitaashture/kubeday-singapore and observe the triggering of the PipelineRun for the pull request
 
-2. Kyverno policy will verify the pushed image is signed and attested before deploying with Argo as part of CD process.
+5. Kyverno policy will verify the pushed image is signed and attested before deploying with Argo as part of CD process.
+6. `kubectl create -f policies/verify-image.yaml`
 
-3. If policy failed to verify image signature then Argo won't create Deployment
+7. If policy failed to verify image signature then Argo won't create Deployment
 
     ```
     kubectl get pods -n NAMESPACE
