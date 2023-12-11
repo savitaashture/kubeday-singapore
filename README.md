@@ -91,7 +91,7 @@ kubectl create secret generic argocd-image-updater-secret \
 kubectl create -f application_integ.yaml -n argocd
 ```
 
-## Install Sigstore Policy Controller
+## Install Kyverno Policy Controller
 
 ```
 kubectl create namespace cosign-system
