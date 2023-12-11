@@ -6,7 +6,7 @@ metadata:
   annotations:
     # The event we are targeting as seen from the webhook payload
     # this can be an array too, i.e: [pull_request, push]
-    pipelinesascode.tekton.dev/on-event: "[push]"
+    pipelinesascode.tekton.dev/on-event: "[pull_request, push]"
 
     # The branch or tag we are targeting (ie: main, refs/tags/*)
     pipelinesascode.tekton.dev/on-target-branch: "[main]"
@@ -19,7 +19,7 @@ metadata:
 
     # Use maven task from hub
     #
-    # pipelinesascode.tekton.dev/task-1: "maven"
+    ## pipelinesascode.tekton.dev/task-1: "maven"
 
     # You can add more tasks by increasing the suffix number, you can specify them as array to have multiple of them.
     # browse the tasks you want to include from hub on https://hub.tekton.dev/
@@ -27,7 +27,7 @@ metadata:
     # pipelinesascode.tekton.dev/task-2: "[curl, buildah]"
 
     # How many runs we want to keep.
-    pipelinesascode.tekton.dev/max-keep-runs: "5"
+    pipelinesascode.tekton.dev/max-keep-runs: "2"
 spec:
   params:
     # The variable with brackets are special to Pipelines as Code
