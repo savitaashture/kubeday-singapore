@@ -1,12 +1,12 @@
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
-  name: require-tekton-namespace-pipelinerun
+  name: require-tekton-name-pipelinerun
 spec:
   validationFailureAction: Enforce
   background: true
   rules:
-  - name: check-pipelinerun-namespace
+  - name: check-pipelinerun-name
     match:
       any:
       - resources:
@@ -18,7 +18,7 @@ spec:
         operator: Equals
         value: CREATE
     validate:
-      message: "A namespace is required and may not be set to default."
+      message: "A generateName is required."
       pattern:
         metadata:
-          generateName: "!default"
+          generateName: "?*"

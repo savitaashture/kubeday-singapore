@@ -13,7 +13,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/anandf/code-to-deployment.git'
+    repoURL: 'https://github.com/savitaashture/code-to-deployment.git'
     path: kustomize_kubeday/overlays/integ
     targetRevision: HEAD
     kustomize:
