@@ -1,29 +1,59 @@
+# apiVersion: kyverno.io/v1
+# kind: ClusterPolicy
+# metadata:
+#   name: require-tekton-securitycontext
+#   annotations:
+#     policies.kyverno.io/title: Require securityContext for Tekton TaskRun
+#     policies.kyverno.io/category: Tekton
+#     policies.kyverno.io/severity: medium
+#     policies.kyverno.io/subject: TaskRun
+#     kyverno.io/kyverno-version: 1.10.0
+#     policies.kyverno.io/minversion: 1.10.0
+#     kyverno.io/kubernetes-version: "1.23"
+#     policies.kyverno.io/description: >- 
+#       A securityContext is required for each TaskRun step.
+# spec:
+#   validationFailureAction: Enforce
+#   background: true
+#   rules:
+#   - name: check-step-securitycontext
+#     match:
+#       any:
+#       - resources:
+#           kinds:
+#           - TaskRun
+#     validate:
+#       message: "A securityContext is required with `privileged` and `allowPrivilegeEscalation` set to `false`."
+#       pattern:
+#         =(status):
+#           =(taskSpec):
+#             steps:
+#               # TODO: missing securityContext for digest-to-results
+#               - (name): "!noop-task"
+#                 securityContext:
+#                   # TODO: ideally all tasks run as non-root
+#                   #runAsNonRoot: false
+#                   privileged: false
+#                   allowPrivilegeEscalation: false
+
+
+# ---
+---
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
-  name: require-tekton-securitycontext
-  annotations:
-    policies.kyverno.io/title: Require securityContext for Tekton TaskRun
-    policies.kyverno.io/category: Tekton
-    policies.kyverno.io/severity: medium
-    policies.kyverno.io/subject: TaskRun
-    kyverno.io/kyverno-version: 1.10.0
-    policies.kyverno.io/minversion: 1.10.0
-    kyverno.io/kubernetes-version: "1.23"
-    policies.kyverno.io/description: >- 
-      A securityContext is required for each TaskRun step.
+  name: require-security-context
 spec:
-  validationFailureAction: Enforce
+  validationFailureAction: enforce
   background: true
   rules:
-  - name: check-step-securitycontext
+  - name: check-step
     match:
-      any:
-      - resources:
-          kinds:
-          - TaskRun
+      resources:
+        kinds:
+        - tekton.dev/v1beta1/TaskRun.status
     validate:
-      message: "A securityContext is required with `privileged` and `allowPrivilegeEscalation` set to `false`."
+      message: "A securityContext is required"
       pattern:
         =(status):
           =(taskSpec):

@@ -4,7 +4,7 @@ metadata:
   name: kubeday-app-integ
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: myimage=quay.io/savitaashture/kubeday-app:main
+    argocd-image-updater.argoproj.io/image-list: myimage=quay.io/savitaashture/kubeday-singapore-app:main
     argocd-image-updater.argoproj.io/myimage.update-strategy: latest
     argocd-image-updater.argoproj.io/myimage.platforms: linux/arm64,linux/amd64
     argocd-image-updater.argoproj.io/myimage.allow-tags: "regexp:^main$"
@@ -19,7 +19,7 @@ spec:
     kustomize:
       images:
         - >-
-          KUBEDAY_IMAGE=quay.io/savitaashture/kubeday-app:main
+          KUBEDAY_IMAGE=quay.io/savitaashture/kubeday-singapore-app:main
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: kubeday-integ

@@ -1,0 +1,24 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-tekton-namespace-pipelinerun
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+  - name: check-pipelinerun-namespace
+    match:
+      any:
+      - resources:
+          kinds:
+          - PipelineRun
+    preconditions:
+      all:
+      - key: "{{ request.operation || 'BACKGROUND' }}"
+        operator: Equals
+        value: CREATE
+    validate:
+      message: "A namespace is required and may not be set to tekton-pipelines."
+      pattern:
+        metadata:
+          namespace: "!tekton-pipelines"

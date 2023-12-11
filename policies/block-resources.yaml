@@ -1,0 +1,29 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: block-tekton-task-runs     
+spec:
+  validationFailureAction: enforce
+  background: false
+  rules:
+  - name: check-taskrun-user
+    match:
+      any:
+      - resources:
+          kinds:
+            - TaskRun
+    exclude:
+      any:
+      - subjects:
+        - kind: User 
+          name: "system:serviceaccount:tekton-pipelines:tekton-pipelines-controller"
+    preconditions:
+      all:
+      - key: "{{ request.operation || 'BACKGROUND' }}"
+        operator: AnyIn
+        value:
+        - CREATE
+        - UPDATE
+    validate:
+      message: Creating a TaskRun is not allowed.
+      deny: {}

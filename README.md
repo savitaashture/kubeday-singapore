@@ -6,7 +6,9 @@
     1.1. You can use Kind/Minikube for this purpose.
 2. Have the kubectl CLI tool installed.
 
-## Installation
+# Installation
+
+## Tekton
 
 1. Install Tekton Pipeline 
     ```bash
@@ -39,38 +41,15 @@
             a. kubectl port-forward <pipelines-as-code-controller-pod-name> 8080:8080 -n pipelines-as-code
        
             b. Use the gosmee client with the following command
+
                ```bash
                gosmee client https://hook.pipelinesascode.com/PCoifdgYPYpS http://localhost:8080
                ```
        **OR**
        
        Follow : https://github.com/openshift-pipelines/pipelines-as-code/blob/main/hack/dev/kind/install.sh to create Kind, install Tekton Pipeline and setup gosmee
-       
-    4. Follow https://pipelinesascode.com/
-       1. Create and configure the GithubApp https://pipelinesascode.com/docs/install/github_apps/
-       2. Create a repository https://pipelinesascode.com/docs/guide/repositorycrd/
 
-5. Follow Tekton Chains Tutorial https://github.com/tektoncd/chains/blob/main/docs/tutorials/signed-provenance-tutorial.md to set up Chains to sign OCI images built in Tekton
-   
-6. Send a pull request to https://github.com/savitaashture/kubeday-india and observe the triggering of the PipelineRun for the pull request
-
-7. After sending a push request, check if the PipelineRun for the push request is triggered.
-
-8. Verify that the pushed image is signed and attested using Tekton Chains
-
-## Documentation References
-
-Tekton Pipeline doc: https://tekton.dev/docs/
-
-Tekton Chains doc: https://tekton.dev/docs/chains/
-
-Pipelines as Code: https://pipelinesascode.com/
-
-Demo Repository: https://github.com/savitaashture/kubeday-india
-
-# ArgoCD
-
-## Install ArgoCD
+## ArgoCD
 ```
 kubectl create ns argocd 
 kubectl apply -f https://raw.githubusercontent.com/argoproj/argo-cd/master/manifests/install.yaml -n argocd
@@ -86,33 +65,59 @@ kubectl create secret generic argocd-image-updater-secret \
   --from-literal argocd.token=${IMAGE_UPDATER_TOKEN} --dry-run=client -o yaml | kubectl -n argocd apply -f - 
 ```
 
-## Install the argo application
-```
-kubectl create -f application_integ.yaml -n argocd
-```
-
-## Install Sigstore Policy Controller
+## Kyverno Policy Controller
 
 ```
-kubectl create namespace cosign-system
-helm repo add sigstore https://sigstore.github.io/helm-charts
-helm repo update
-helm install policy-controller -n cosign-system sigstore/policy-controller --devel
+kubectl create -f https://github.com/kyverno/kyverno/releases/download/v1.10.0/install.yaml
 ```
 
-## Wait for the policy controller to be available
+## Wait for the kyverno controller to be available
 ```
-kubectl -n cosign-system wait --for=condition=Available deployment/policy-controller-webhook && \
-kubectl -n cosign-system wait --for=condition=Available deployment/policy-controller-webhook
-```
-
-## Enable guestbook namespace in image validation and policy enforcement
-```
-kubectl create ns guestbook
-kubectl label namespace guestbook policy.sigstore.dev/include=true
+kubectl -n kyverno wait --for=condition=Available deployment/kyverno-admission-controller && \
+kubectl -n kyverno wait --for=condition=Available deployment/kyverno-background-controller && \
+kubectl -n kyverno wait --for=condition=Available deployment/kyverno-cleanup-controller && \
+kubectl -n kyverno wait --for=condition=Available deployment/kyverno-reports-controller
 ```
 
-```
-kubectl create ns kubeday-integ
-kubectl label namespace kubeday-integ policy.sigstore.dev/include=true
-```
+# Instruction to setup and verify CI/CD flow
+
+## CI (Tekton)
+
+1. Apply policies which are required for CI flow
+
+    *. `kubectl create -f policies/require-namespace.yaml`
+
+2. Kyverno policies will kick in and reject request if not satisfied
+
+3. Follow https://pipelinesascode.com/
+
+       1. Create and configure the GithubApp https://pipelinesascode.com/docs/install/github_apps/
+
+       2. Create a repository https://pipelinesascode.com/docs/guide/repositorycrd/
+
+4. Follow Tekton Chains Tutorial https://github.com/tektoncd/chains/blob/main/docs/tutorials/signed-provenance-tutorial.md to set up Chains to sign OCI images built in Tekton
+
+    **Note:** Use the same namespace where Pipelines as Code repo created
+
+5. Send a pull request to https://github.com/savitaashture/kubeday-singapore and observe the triggering of the PipelineRun for the pull request
+
+6. Create the argo application
+
+    ```
+    kubectl create -f argo/application.yaml -n argocd
+    ```
+
+7. Again Kyverno will verify the pushed image is signed and attested before deploying with Argo as part of CD process.
+
+
+# Documentation References
+
+Tekton Pipeline doc: https://tekton.dev/docs/
+
+Tekton Chains doc: https://tekton.dev/docs/chains/
+
+Pipelines as Code: https://pipelinesascode.com/
+
+Kyverno: https://kyverno.io/docs
+
+Demo Repository: https://github.com/savitaashture/kubeday-singapore
